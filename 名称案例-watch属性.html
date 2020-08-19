@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 方式一:keyup -->
+        <input type="text" v-model="firstname" @keyup="getFullname">
+        <input type="text" v-model="lastname" @keyup="getFullname">
+        <input type="text" v-model="fullname">
+        <hr>
+        <!-- 方式二 -->
+        <input type="text" v-model="firstname2">
+        <input type="text" v-model="lastname2">
+        <input type="text" v-model="fullname2">
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                firstname:'',
+                lastname:'',
+                fullname:'',
+                firstname2:'',
+                lastname2:'',
+                fullname2:''
+            },
+            methods: {
+                getFullname(){
+                    this.fullname = this.firstname + '-' + this.lastname
+                },
+            },
+
+            watch: {
+                // 使用watch属性，可以见识data中指定的数据的变化，然后出发watch中对应的function处理函数
+                // watch里的function提供了两个参数newVal和oldVal，表示被监视数据修改前的数据和修改后的数据
+                'firstname2':function(newVal,oldVal){
+                //    this.fullname2 = this.firstname2 + '-' + this.lastname2
+                   console.log(newVal+'----'+ oldVal)
+                   this.fullname2 = newVal +'-'+ this.lastname2
+                },
+
+                'lastname2':function(newVal){
+                    this.fullname2 = this.firstname2 + '-' + newVal
+                }
+            },
+        });
+    </script>
+</body>
+
+</html>

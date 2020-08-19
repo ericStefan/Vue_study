@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="./lib/bootstrap.css">
+</head>
+
+<body>
+    <div id="app">
+
+        
+        <div class="panel panel-primary">
+              <div class="panel-heading">
+                    <h3 class="panel-title">添加品牌</h3>
+              </div>
+              <div class="panel-body form-inline">
+                    <label>
+                        ID:
+                        <input type="text" class="form-control" v-model="id"  @keyup.f2='add()'>
+                    </label>
+                    <label>
+                        Name:
+                        <input type="text" class="form-control" v-model="name" @keyup.enter='add()'>
+                    </label>
+
+                    <input type="button" value="添加" class="btn btn-primary" @click="add()" >
+                    <label>
+                        搜索关键词：
+                        <input type="text" class="form-control" v-model="keywords" v-focus v-color="'blue'">
+                    </label>
+              </div>
+        </div>
+        
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Ctime</th>
+                    <th>Operation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in search(keywords)" :key="item.id">
+                    <td>{{item.id}}</td>
+                    <td v-text="item.name" ></td>
+                    <td>{{item.ctime |dateFormat('')}}</td>
+                    <td><a href="" @click.prevent="del(item.id)">删除</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+         
+    <div id="app2">
+        <p v-fontweight="900" v-fontsize = "'30px'">{{dt|dateFormat}}</p>
+    </div>
+    <script>
+        Vue.filter('dateFormat',function(dateStr,pattern=''){
+            // 根据给定字符串得到指定时间
+            var dt = new Date(dateStr);
+
+            // yyyy-mm-dd
+            // 使用padStart(a,b)对字符串进行位数填充，参数a表示字符串的总长度，b表示被用来填充的字符串
+            var y = dt.getFullYear();
+            var m = (dt.getMonth()+1).toString().padStart(2,'0');
+            var d = dt.getDate().toString().padStart(2,'0');
+
+            if(pattern && pattern.toLowerCase() === 'yyyy-mm-dd'){
+                return `${y}-${m}-${d}`
+            }else{
+                var hh = dt.getHours().toString().padStart(2,'0');
+                var mm = dt.getMinutes().toString().padStart(2,'0');
+                var ss = dt.getSeconds().toString().padStart(2,'0');
+
+                return `${y}-${m}-${d}-${hh}:${mm}:${ss}`
+            }
+        })
+
+        // 自定义全局键值码
+        Vue.config.keyCodes.f2 = 113;
+
+        // 使用Vue.directive()定义全局指令
+        // 参数1是指令名称， 定义时的名称不加v-前缀，调用时需要加上v-前缀。
+        Vue.directive('focus',{
+            bind:function(el){//每当指令绑定到元素上的时候，会立即执行这个bind函数，只执行一次
+                // tips:在每个函数中，第一个参数，永远是el，表示被绑定了指令的哪个元素，这个el参数，是一个原生的js对象
+                // 在元素刚绑定了指令时候，没有插入到DOM中区，这时候，调用foucs方法没有作用
+                //一个元素只有被插入到DOM之后才能获取焦点    
+                // el.focus()
+            },
+            inserted:function(el){//inserted表示元素插入到DOM中的时候，胡执行inserted函数【触发一次】
+                el.focus()
+            },
+            updated:function(){//当VNode更新的时候会执行update，可能回出发多次
+
+            },
+        })
+
+        Vue.directive('color',{
+            // 与样式相关的操作一般都可以在bind中执行，只要给定了绑定的原始，无论元素是否被插入到页面中，这个元素肯定有一个内联样式
+            // 与js行为相关的操作，一般在inserted中执行，否则js行为不生效
+            bind:function(el,binding){
+                // el.style.color = 'red';
+                // binding是形参，可以自定义参数名
+                el.style.color = binding.value
+            }
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                id:"",
+                name:"",
+                keywords:"",
+                list:[
+                    {id:1, name:'奔驰', ctime: new Date()},
+                    {id:2, name:'宝马', ctime: new Date()}
+                ]
+            },
+
+            filters:{
+
+            },
+
+            methods: {
+                add(){
+                    var car = {id: this.id, name:this.name,ctime:new Date()};
+                    this.list.push(car);
+                    this.id = '';
+                    this.name = '';
+                },
+
+                del(id){
+                    // 根据id删除数据
+                    // 使用some()方法
+                    this.list.some((item,i)=>{
+                        if(item.id ===id){
+                            this.list.splice(i,1)
+                            return true;
+                        }
+                    })
+
+                    // 使用findIndex 检索索引
+                    //    var index = this.list.findIndex(item=>{
+                    //         if(item.id === id){
+                    //             this.list.splice(index,1);
+                    //             return true;
+                    //         }
+                    //     })
+                    //     console.log('hello')
+                },
+
+                search(keywords){
+                    // 根据关键字搜索
+                    // var newList = [];
+                    // this.list.forEach(item=>{
+                    //     if(item.name.indexOf(keywords) !=-1){
+                    //         newList.push(item)
+                    //     }
+                    // })
+                    // return newList;
+                    return newList = this.list.filter(item=>{
+                        // Es6中新方法 string.protype.include('要包含的字符串')，来表达字符串包含另一个字符串
+                        if(item.name.includes(keywords)){
+                            return item;
+                        }
+                    })
+                    
+                }
+            },
+
+            
+        });
+
+        var vm2 = new Vue({
+            el:'#app2',
+            data:{
+                dt:new Date()
+            },
+
+            methods:{},
+
+            directives:{
+                'fontweight':{
+                    bind:function(el,binding){
+                        el.style.fontWeight = binding.value;
+                    }
+                },
+
+                'fontsize':function(el,binding){//这个function等同于把代码写进了bind和update中去
+                    el.style.fontSize = parseInt(binding.value) + 'px'
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

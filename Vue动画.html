@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="./lib/animate.css">
+    <style>
+        /*
+        v-enter  进入前的时间点，此时还未开始进入
+        v-leave-to 离开后的时间点，离开的终止状态，此时，元素动画已经结束
+         */
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateX(150px);
+        }
+
+        /*
+        v-enter-activate 入场时间段
+        v-leave-active  离场时间段 
+         */
+        .v-enter-active,
+        .v-leave-active{
+            transition: all 0.8s ease;
+        }
+
+        .my-enter,
+        .my-leave-to{
+            opacity: 0;
+            transform: translateY(150px);
+        }
+
+        .my-enter-active,
+        .my-leave-active{
+            transition: all 0.8s ease;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <input type="button" value="按钮" @click="flag = !flag">
+        
+        <transition>
+            <h3 v-if="flag">这是一个h3</h3>
+        </transition>
+
+        <hr/>
+        <input type="button" value="按钮2" @click="flag2 = !flag2">
+        <transition name="my">
+            <!-- 使用transition的name属性可以自定义样式中类名前缀 -->
+        <h6 v-if="flag2">这是一个h6</h6>
+        </transition>
+
+        <hr/>
+        <input type="button" value="按钮3" @click = "flag3 = !flag3">
+        <!-- duration="{enter:200,leave:400}"属性可以分别设置进入动画和弹出动画的时长-->
+        <transition name="ani"  enter-active-class="animated bounceIn" leave-active-class="animated bounceOut" :duration="{enter:200,leave:400}">
+            <!-- 使用第三方库animate.css渲染动画 -->
+            <h4 v-if="flag3">这是一个h4</h3>
+        </transition>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                flag: false,
+                flag2: false,
+                flag3: false
+            },
+            methods: {}
+        });
+    </script>
+</body>
+
+</html>

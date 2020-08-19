@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+
+<body>
+    <template id="temp1">
+        <div>
+            <h1>这是子元素---{{parentmsg}}</h1>
+            <input type="button" value="给父组件传递消息" @click='sendMsg'>
+        </div>
+    </template>
+    <div id="app">
+        <com1 :parentmsg='msg' @func='getMsgFromSon'></com1>
+    </div>
+
+    <script>
+        var com1 = {
+            template:'#temp1',
+            data(){
+                return{
+                    msg:'传递给父组件的值'
+                }
+            },
+
+            props:['parentmsg'],
+
+            methods:{
+                sendMsg(){
+                   this.$emit('func',this.msg) 
+                }
+            }
+
+        };
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                msg:'这是父组件的值',
+                msgFromSon:''
+            },
+            methods: {
+                getMsgFromSon(data){
+                    this.msgFromSon = data;
+                    console.log(this.msgFromSon)
+                }
+            },
+
+            components:{
+                com1
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>生命周期</title>
+    <script src="./lib/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <input type="button" value="修改msg" @click="msg='no'">
+        <h1 id="h1">{{msg}}</h1>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                msg:'ok'
+            },
+            methods: {
+                show(){
+                    console.log('执行了show方法')
+                }
+            },
+            beforeCreate() {
+                // 在beforeCreate之前data中的数据和methods里的方法都没有初始化
+                // console.log(this.msg)
+                // this.show()
+            },
+
+            created() {
+                // 在created中，data中的数据和methods的方法都已经初始化
+                // 使用data的数据和methods的方法最早只能在created钩子里使用
+                console.log(this.msg);
+                this.show();
+            },
+
+            beforeMount() {
+                // beforeMount执行的时候，模板以及在内存里编译完成，但还没有加载到页面里去，此时页面还是旧页面
+                // 此时页面中的{{msg}}还没有被vue替换。
+                console.log(document.getElementById('h1').innerText)
+            },
+
+            mounted() {
+                // 将内存中编译好的模板真是地替换到浏览器的页面中去，用户已经可以看到渲染好的页面
+                console.log(document.getElementById('h1').innerText)
+                // mounted是实例创建的最后一个生命周期函数，当执行完mounted就表示，实例已经完全被创建好。如果后面没有操作，这个实例就静静的存在内存当中。
+                // 要通过某些插件操作页面的DOM节点，最早要在mounted中执行。
+            },
+
+            // 接下来是运行中的两个时间
+            // beforeUpdate和updated根据数据的改变选择执行0到多次。
+            beforeUpdate() {
+                // 此时界面没有被更新，数据肯定被更新了
+                // 当数据改变，执行beforeUpdate时，页面还没有被改变，数据已经被改变了
+                console.log('界面上元素中内容：'+ document.getElementById('h1').innerText);
+                console.log('data中的数据是'+ this.msg)
+            },
+
+            updated() {
+                // updated时间执行时，页面和数据已经保持同步了。
+                console.log('1界面上元素中内容：'+ document.getElementById('h1').innerText);
+                console.log('1data中的数据是'+ this.msg)
+            },
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <script src="./lib/vue-router.js"></script>
+    <style>
+        /* .router-link-active{
+            color:red;
+            font-weight: 800;
+            font-style: italic;
+            font-size: 20px;
+            text-decoration: underline;
+        } */
+
+        .myactive{
+            color:red;
+            font-weight: 800;
+            font-style: italic;
+            font-size: 20px;
+            text-decoration: underline;
+        }
+
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateX(100px);
+        }
+
+        .v-enter-active,
+        .v-leave-active{
+            transition: all ease 0.6s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <a href="#/login">登录</a>
+        <a href="#/register">注册</a> -->
+        <!-- router-link默认渲染成a标签,使用tag属性，可以渲染成指定的标签,无论什么标签均可实现点击 -->
+        <router-link to="/login" tag="span">登录</router-link>
+        <router-link to="/register" tag="span">注册</router-link>
+        <!-- 这是vue-router提供的元素，用来当作占位符的，将来，路由规则匹配到的组件会展示到router-view当中-->
+        <transition mode="out-in">
+            <router-view></router-view>
+        </transition>
+
+    </div>
+
+
+    <script>
+        var login = {
+            template: '<h1>登录组件</h1>'
+        }
+
+        var register = {
+            template: '<h1>注册组件</h1>'
+        }
+        // 导入vue-router包后，window全局对象中就有了一个路由构造函数，叫做VueRouter
+        var routerObj = new VueRouter({
+            //这个route表示路由匹配规则
+            routes: [
+                // 每个路由规则都是一个对象，这个规则对象身上有两个必须的属性
+                // 属性1是path，表示监听哪个路由链接地址
+                // 属性2是component，表示。如果是前面匹配到的path，这展示component属性对应的那个组件
+                // component的属性值必须是一个组件的模版对象，不能是组件的模版名称。
+                {path:'/',redirect:'/login'},//这里的redirect和node中的redirect完全两回事
+                // 使用redirect可以强制展示组件，进行重对象
+                { path: '/login', component: login },
+                { path: '/register', component: register }
+            ],
+
+            linkActiveClass:'myactive',
+            // 使用linkActiveClass属性可以将原生提供的.router-link-active类重新命名
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {},
+            methods: {},
+
+            router: routerObj,//将路由规则对象注册到vm实例上，用来监听URL地址变化，展示不同组件。
+            components: {
+            }
+
+        });
+    </script>
+</body>
+
+</html>

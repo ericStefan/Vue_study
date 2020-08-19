@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+
+<body>
+    <template id="counter">
+        <div>
+            <input type="button" value="+1" @click='add()'>
+            <h3>{{count}}</h3>
+        </div>
+    </template>
+    <div id="app">
+        <mycom1></mycom1>
+        <counter></counter>
+        <counter></counter>
+        <counter></counter>
+    </div>
+
+    <script>
+        var object = {count:0}
+        Vue.component('counter',{
+            template:"#counter",
+            data:function(){
+                // 如果data中的function返回的不是对象{}，在多次调用组件的时候，组件间的数据会互相干扰，为了避免这种情况，必须使用function返回{}对象
+                // return object;
+                return {
+                    count:0,
+                }
+            },
+
+            methods:{
+                add(){
+                    this.count++;
+                }
+            }
+        })
+        Vue.component('mycom1',{
+            template:"<h1>这是一个全局组件---{{msg}}</h1>",
+            
+            // 组件的data必须是一个方法，这个方法内部必须返回一个对象
+            // 组件中的data使用方式与实例中data一样
+            data:function(){
+                return {
+                    msg:"这是组件自己的data定义的数据"
+                };
+            }
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {},
+            methods: {}
+        });
+    </script>
+</body>
+
+</html>

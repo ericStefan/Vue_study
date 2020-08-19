@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <style>
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateX(150px);
+        }
+
+        .v-enter-active,
+        .v-leave-active{
+            transition: all 0.6s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <a href="" @click.prevent='flag = true'>登录</a>
+        <a href="" @click.prevent="flag = false">注册</a>
+        <login v-if="flag"></login>
+        <register v-else="flag"></register>
+
+    </hr>
+    <a href="" @click.prevent="comName = 'login'">登录</a>
+        <a href="" @click.prevent="comName = 'register'">注册</a>
+        <a href="" @click.prevent="comName = 'logout'">注销</a>
+        <!-- vue提供了componnet元素来展示对应名称的组件，component是一个占位符，:is属性可以用来展示组件名称 -->
+        <!-- 注意：组件名称是字符串，在写进:is中需要再使用''包裹字符串 -->
+        <transition mode="out-in">
+            <!-- 使用transition渲染多个组件动画时，直接使用，不需要绑定key值 -->
+            <!-- 使用mode属性，可以设置组件切换的方式，out-in表示先出后进，可以避免一个组件还未离开，另一个组件出现在下方 -->
+            <component :is="comName"></component>
+        </transition>
+    </div>
+
+    <script>
+        Vue.component('login',{
+            template:"<h3>登录组件</h3>"
+        })
+
+        Vue.component('register',{
+            template:"<h3>这是注册组件</h3>"
+        })
+
+        Vue.component('logout',{
+            template:"<h3>这是注销组件</h3>"
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                flag:true,
+                comName:'login'//当前componnet中:is绑定的组件名称
+            },
+            methods: {}
+        });
+    </script>
+</body>
+
+</html>

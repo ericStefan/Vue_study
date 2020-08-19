@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <script src="./lib/vue-resource-1.3.4.js"></script>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7.css">
+    <style>
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .v-enter-active,
+        .v-leave-active{
+            transition: all 0.6s ease;
+        }
+
+        /* 
+        可以实现列表删除后，其他行列表填充时候的过渡动画，要注意的是，如果元素没有设置宽度，移动的时候会以最小宽度移动
+        .v-move
+        {
+            transition: all 0.6s ease;
+        }
+
+        .v-leave-active{
+            position: absolute;
+        } */
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">添加品牌</h3>
+            </div>
+            <div class="panel-body form-inline">
+                <label>
+                    Name:
+                    <input type="text" v-model="name" class="form-control" @keyup.enter="add()" v-focus>
+                </label>
+                <input type="button" value='添加' @click="add()" class="btn btn-primary">
+            </div>
+        </div>
+
+
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Ctime</th>
+                    <th>Operation</th>
+                </tr>
+            </thead>
+            <tbody is="transition-group">           
+                    <tr v-for='item in list' :key="item.id" >
+                        <td>{{item.id}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.ctime|dateFormat('')}}</td>
+                        <td><a href="" @click.prevent="del(item.id)">删除</a></td>
+                    </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <script>
+        // 全局配置了请求数据的根域名，每次发起单独http请求时候，请求的url前不加/，否者不启用根路径拼接
+        Vue.http.options.root = 'http://www.liulongbin.top:3005/';
+
+        // 全局启用emulateJSON = true
+        Vue.http.options.emulateJSON = true;
+
+        // 全局时间格式化过滤器
+        Vue.filter('dateFormat',function(dateStr,pattern=''){
+            // 根据给定字符串得到指定时间
+            var dt = new Date(dateStr);
+                // yyyy-mm-dd
+                // 使用padStart(a,b)对字符串进行位数填充，参数a表示字符串的总长度，b表示被用来填充的字符串
+                var y = dt.getFullYear();
+                var m = (dt.getMonth() + 1).toString().padStart(2, '0');
+                var d = dt.getDate().toString().padStart(2, '0');
+
+                    // 根据dt传入参数格式确定精确到小时还是秒
+                if (pattern && pattern.toLowerCase() === 'yyyy-mm-dd') {
+
+                    return `${y}-${m}-${d}`
+                } else {
+                    var hh = dt.getHours().toString().padStart(2, '0');
+                    var mm = dt.getMinutes().toString().padStart(2, '0');
+                    var ss = dt.getSeconds().toString().padStart(2, '0');
+                    
+                    return `${y}-${m}-${d}-${hh}:${mm}:${ss}`
+                }
+        });
+
+        // 光标聚焦指令
+        Vue.directive('focus',function(el,binding){
+            el.focus();
+        }
+        )
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                id: '',
+                name: '',
+                ctime: '',
+                list: [
+                    // { id: 1, name: '兰博基尼', ctime: new Date() },
+                    // { id: 2, name: '保时捷', ctime: new Date() }
+                ]
+            },
+            methods: {
+                // add() {
+                //     this.$http.post('api/addproduct', { name: this.name }, { emulateJSON: true }).then(result => {
+                //         if (result.body.status === 0) {
+                //             // 成功了
+                //             // 添加完成后手动调用getAllList()就可以刷新品牌列表
+                //             this.getAllList();
+                //             this.name = '';
+                //         } else {
+                //             // 失败了
+                //             alert('添加品牌失败')
+                //         }
+                //     })
+                // },
+                add() {
+                    this.$http.post('api/addproduct', { name: this.name }).then(result => {
+                        if (result.body.status === 0) {
+                            // 成功了
+                            // 添加完成后手动调用getAllList()就可以刷新品牌列表
+                            this.getAllList();
+                            this.name = '';
+                        } else {
+                            // 失败了
+                            alert('添加品牌失败')
+                        }
+                    })
+                },
+
+                getAllList() {
+                    // 获取所有品牌列表
+                    this.$http.get('api/getprodlist').then(result => {
+                        var result = result.body;
+                        if (result.status === 0) {
+                            // 返回status ===0 表示获取数据成功
+                            this.list = result.message
+                        } else {
+                            alert('获取列表数据失败')
+                        }
+                    })
+
+                },
+
+                del(id) {
+                    // 删除对应商品
+                    this.$http.get('api/delproduct/' + id).then(result => {
+                        if (result.body.status === 0) {
+                            // 成功了
+                            this.getAllList();
+                        } else {
+                            // 失败了
+                            alert('删除数据失败')
+                        }
+                    })
+                },
+            },
+
+
+
+            created() {
+                // 当vm实例的data和methods初始化完毕后，vm实例会自动执行created
+                this.getAllList();
+            }
+        });
+    </script>
+</body>
+
+</html>
